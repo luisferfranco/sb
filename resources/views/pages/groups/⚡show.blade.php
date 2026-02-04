@@ -3,6 +3,7 @@
 use App\Models\Group;
 use Mary\Traits\Toast;
 use Livewire\Component;
+use App\Enums\GroupMemberStatus;
 
 new class extends Component
 {
@@ -34,7 +35,7 @@ new class extends Component
 
     // create a join request (pending by default)
     $this->group->members()
-      ->syncWithoutDetaching([$user->id => ['status' => 'pending']]);
+      ->syncWithoutDetaching([$user->id => ['status' => GroupMemberStatus::PENDING->value]]);
 
     // Recargamos datos
     $this->updateData();
@@ -44,11 +45,33 @@ new class extends Component
   public function approve(int $userId): void
   {
     $this->group->members()
-      ->updateExistingPivot($userId, ['status' => 'approved']);
+      ->updateExistingPivot($userId, ['status' => GroupMemberStatus::APPROVED->value]);
 
     // Recargamos datos
     $this->updateData();
     $this->success('Solicitud aprobada');
+  }
+
+  public function reject(int $userId): void
+  {
+    $this->group->members()
+      ->updateExistingPivot($userId, ['status' => GroupMemberStatus::REJECTED->value]);
+
+    $this->updateData();
+    $this->success('Solicitud rechazada');
+  }
+
+  public function leave(): void
+  {
+    $user = auth()->user();
+    if (! $user) {
+      return;
+    }
+
+    $this->group->members()->detach($user->id);
+
+    $this->updateData();
+    $this->success('Has abandonado el grupo');
   }
 };
 ?>
@@ -67,14 +90,19 @@ new class extends Component
       label="Unirse"
       />
   @else
-    <span class="inline-flex items-center px-2 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
-      {{ ucfirst($member->pivot->status ?? 'miembro') }}
-    </span>
-    <x-button
-      wire:click="leave"
-      class="btn-error"
-      label="Salir"
+    <div class="flex flex-col gap-2">
+      <x-badge
+        value="{{ $member->pivot->status->label() }}"
+        class="badge-{{ $member->pivot->status->color() }}"
       />
+    <p>
+      <x-button
+        wire:click="leave"
+        class="btn-error btn-sm"
+        label="Salir"
+        />
+    </p>
+    </div>
   @endif
 
   <div class="mt-4">Leaderboard del grupo</div>
@@ -84,12 +112,20 @@ new class extends Component
     :rows="$group->members"
     >
     @scope('cell_user', $r)
-      {{ $r->name }}
+      <p>{{ $r->name }}</p>
+      <p class="text-sm text-base-content/50">{{ $r->email }}</p>
+    @endscope
+
+    @scope('cell_pivot.status', $r)
+      <x-badge
+        value="{{ $r->pivot->status->label() }}"
+        class="badge-{{ $r->pivot->status->color() }}"
+      />
     @endscope
 
     @scope('actions', $r)
       @can('approve', $this->group)
-        @if ($r->pivot->status === 'pending')
+        @if ($r->pivot->status === GroupMemberStatus::PENDING)
           <div class="flex gap-2">
             <x-button
               wire:click="approve({{ $r->id }})"

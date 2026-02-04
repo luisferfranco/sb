@@ -6,27 +6,27 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-  /**
-   * Run the migrations.
-   */
-  public function up(): void
-  {
-    Schema::create('group_user', function (Blueprint $table) {
-      $table->id();
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('group_user', function (Blueprint $table) {
+            $table->id();
 
-      $table->foreignIdFor(\App\Models\Group::class)->constrained()->onDelete('cascade');
-      $table->foreignIdFor(\App\Models\User::class)->constrained()->onDelete('cascade');
-      $table->enum('status', ['approved', 'pending', 'rejected'])->default('pending');
+            $table->foreignIdFor(\App\Models\Group::class)->constrained()->onDelete('cascade');
+            $table->foreignIdFor(\App\Models\User::class)->constrained()->onDelete('cascade');
+            $table->enum('status', ['approved', 'pending', 'rejected'])->default('pending');
 
-      $table->timestamps();
-    });
-  }
+            $table->timestamps();
+        });
+    }
 
-  /**
-   * Reverse the migrations.
-   */
-  public function down(): void
-  {
-    Schema::dropIfExists('groups_users');
-  }
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('group_user');
+    }
 };

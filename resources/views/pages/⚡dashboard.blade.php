@@ -4,6 +4,7 @@ use App\Models\Group;
 use Mary\Traits\Toast;
 use Livewire\Component;
 use Illuminate\Support\Str;
+use App\Enums\GroupMemberStatus;
 
 new class extends Component
 {
@@ -33,7 +34,7 @@ new class extends Component
       'description' => $this->description,
       'owner_id'    => auth()->id(),
     ]);
-    $group->members()->attach(auth()->id(), ['status' => 'approved']);
+    $group->members()->attach(auth()->id(), ['status' => GroupMemberStatus::approved->value]);
 
     $this->groups->push($group);
     $this->reset(['name', 'description', 'openModal']);
