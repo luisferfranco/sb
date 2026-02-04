@@ -6,3 +6,4 @@ Route::livewire('/dashboard', 'pages::dashboard')->name('dashboard');
 
 Route::livewire('/', 'pages::users.index');
 
+Route::livewire('/groups/{group}', 'pages::groups.show')->name('groups.show');

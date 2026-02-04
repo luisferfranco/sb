@@ -21,9 +21,10 @@ class extends Component
       'password' => 'required|string|min:8',
     ]);
 
-    if (!auth()->attempt(['email' => $this->email, 'password' => $this->password])) {
+    if (!auth()->attempt(['email' => $this->email, 'password' => $this->password], true)) {
       return $this->error('Credenciales inválidas.');
     }
+    session()->regenerate();
 
     // Redirigir o mostrar un mensaje de éxito
     $this->success('Inicio de sesión exitoso.');
