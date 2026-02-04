@@ -72,11 +72,18 @@ new class extends Component
 
   <h1 class="text-2xl font-bold mb-4">Dashboard</h1>
 
-  <x-button
-    label="Nuevo Grupo"
-    class="btn-success"
-    @click="$wire.openModal=true"
-    />
+  <div class="flex justify-between items-center">
+    <x-button
+      label="Nuevo Grupo"
+      class="btn-success"
+      @click="$wire.openModal=true"
+      />
+    <x-button
+      label="Eventos"
+      class="btn-secondary"
+      link="{{ route('events.index') }}"
+      />
+  </div>
 
   <x-table
     :headers="$headers"

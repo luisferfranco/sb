@@ -2,8 +2,14 @@
 
 Route::livewire('/register', 'pages::auth.register')->name('register');
 Route::livewire('/login', 'pages::auth.login')->name('login');
-Route::livewire('/dashboard', 'pages::dashboard')->name('dashboard');
 
 Route::livewire('/', 'pages::users.index');
 
-Route::livewire('/groups/{group}', 'pages::groups.show')->name('groups.show');
+Route::middleware(['auth'])->group(function () {
+    Route::livewire('/dashboard', 'pages::dashboard')->name('dashboard');
+    Route::livewire('/groups/{group}', 'pages::groups.show')->name('groups.show');
+
+    Route::livewire('/events', 'pages::events.index')->name('events.index');
+    Route::livewire('/events/create', 'pages::events.create')->name('events.create');
+    Route::livewire('/events/{event}', 'pages::events.show')->name('events.show');
+});

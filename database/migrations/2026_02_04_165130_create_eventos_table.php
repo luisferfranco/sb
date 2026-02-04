@@ -19,6 +19,7 @@ return new class extends Migration
             $table->enum('type', ['global', 'local'])->default('local');
             $table->enum('status', ['active', 'inactive', 'archived'])->default('active');
             $table->foreignIdFor(\App\Models\Group::class)
+                ->nullable()
                 ->constrained()
                 ->onDelete('cascade');
             $table->foreignIdFor(\App\Models\User::class, 'owner_id')
