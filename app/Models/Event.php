@@ -19,8 +19,8 @@ class Event extends Model
     ];
 
     protected $casts = [
-        'type' => EventType::class,
-        'status' => EventStatus::class,
+        'type'    => EventType::class,
+        'status'  => EventStatus::class,
     ];
 
     public function group(): BelongsTo
@@ -31,5 +31,10 @@ class Event extends Model
     public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'owner_id');
+    }
+
+    public function props()
+    {
+        return $this->hasMany(Prop::class);
     }
 }

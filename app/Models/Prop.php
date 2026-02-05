@@ -10,8 +10,9 @@ class Prop extends Model
     protected $fillable = [
         'event_id',
         'description',
-        'line',
-        'is_over',
+        'opca',
+        'opcb',
+        'is_a',
     ];
 
     public function event(): BelongsTo

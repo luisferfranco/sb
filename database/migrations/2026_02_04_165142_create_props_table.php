@@ -18,8 +18,10 @@ return new class extends Migration
                 ->constrained()
                 ->onDelete('cascade');
             $table->string('description');
-            $table->float('line');
-            $table->boolean('is_over')->nullable();
+            $table->string('opca');
+            $table->string('opcb');
+
+            $table->boolean('is_a')->nullable();
 
             $table->timestamps();
         });
