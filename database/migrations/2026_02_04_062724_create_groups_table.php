@@ -18,7 +18,9 @@ return new class extends Migration
             $table->string('name');
             $table->text('description')->nullable();
             $table->string('slug')->unique();
-            $table->foreignIdFor(User::class, 'owner_id')->constrained()->onDelete('cascade');
+            $table->foreignIdFor(User::class, 'owner_id')
+              ->constrained()
+              ->onDelete('cascade');
             $table->timestamps();
         });
     }

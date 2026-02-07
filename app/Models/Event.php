@@ -37,4 +37,9 @@ class Event extends Model
     {
         return $this->hasMany(Prop::class);
     }
+
+    public function groups()
+    {
+        return $this->hasMany(Group::class);
+    }
 }

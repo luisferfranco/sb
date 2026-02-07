@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Enums\GroupStatus;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Model;
 
 class Group extends Model
 {
@@ -12,6 +13,14 @@ class Group extends Model
         'description',
         'owner_id',
         'slug',
+        'event_id',
+        'status',
+        'published',
+    ];
+
+    protected $casts = [
+        'status'    => GroupStatus::class,
+        'published' => 'boolean',
     ];
 
     protected static function booted()
@@ -37,5 +46,15 @@ class Group extends Model
             ->using(GroupUser::class)
             ->withTimestamps()
             ->withPivot('status');
+    }
+
+    public function event()
+    {
+        return $this->belongsTo(Event::class);
+    }
+
+    public function predictions()
+    {
+        return $this->hasMany(Prediction::class);
     }
 }
