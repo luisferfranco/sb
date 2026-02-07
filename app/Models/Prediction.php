@@ -7,16 +7,16 @@ use Illuminate\Database\Eloquent\Model;
 class Prediction extends Model
 {
     protected $fillable = [
-        'user_id',
+        'ticket_id',
         'prop_id',
         'group_id',
         'option',
         'points',
     ];
 
-    public function user()
+    public function ticket()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Ticket::class);
     }
 
     public function prop()

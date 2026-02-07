@@ -13,6 +13,12 @@ class GroupPolicy
         return $group->owner_id === $user->id;
     }
 
+    public function manage(User $user, Group $group): bool
+    {
+        // Solo el dueño del grupo puede gestionarlo
+        return $group->owner_id === $user->id;
+    }
+
     /**
      * Determine whether the user can view any models.
      */

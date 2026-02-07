@@ -20,7 +20,7 @@ return new class extends Migration
             $table->foreignIdFor(\App\Models\Prop::class)
               ->constrained()
               ->cascadeOnDelete();
-            $table->foreignIdFor(\App\Models\User::class)
+            $table->foreignIdFor(\App\Models\Ticket::class)
               ->constrained()
               ->cascadeOnDelete();
             $table->string('option');

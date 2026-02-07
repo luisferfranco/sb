@@ -19,6 +19,7 @@ new class extends Component
   public $published;
   public $global=false;
   public $eventCount=0;
+  public $accepting = true;
 
   public function mount(Group $group): void
   {
@@ -34,9 +35,9 @@ new class extends Component
       ->orderBy('name', 'asc')
       ->get();
     $this->published  = $group->published;
+    $this->accepting  = $group->accepting;
     $this->event_id   = $group->event_id;
     $this->eventCount = Event::where('group_id', $group->id)->count();
-    info("Event ID: " . $this->eventCount);
   }
 
   public function updateData(): void
@@ -91,27 +92,6 @@ new class extends Component
     $this->success('Has abandonado el grupo');
   }
 
-  public function createEvent(): void
-  {
-    $event = Event::create([
-      'name'     => 'Evento del Grupo: ' . $this->group->name,
-      'type'     => \App\Enums\EventType::LOCAL,
-      'owner_id' => auth()->id(),
-      'group_id' => $this->group->id,
-      'status'   => \App\Enums\EventStatus::INACTIVE,
-    ]);
-
-    $this->group->event_id = $event->id;
-    $this->group->save();
-
-    $this->event_id = $event->id;
-    $this->eventCount = Event::where('group_id', $this->group->id)->count();
-
-    $this->success('Evento creado exitosamente. Ahora puedes agregar props al evento desde la sección de eventos.');
-
-    $this->redirectRoute('events.show', ['event' => $event->id]);
-  }
-
   public function updatedPublished($value): void
   {
     $this->group->published = $value;
@@ -129,6 +109,17 @@ new class extends Component
 
     $this->success('Evento del grupo actualizado');
   }
+
+  public function updatedAccepting($value): void
+  {
+    $this->group->accepting = $value;
+    $this->group->save();
+
+    $message = $value ? 'El grupo ahora está aceptando inscripciones' : 'El grupo ha cerrado las inscripciones';
+
+    $this->dispatch('accepting-updated', ['accepting' => $value]);
+    $this->success($message);
+  }
 };
 ?>
 
@@ -139,7 +130,7 @@ new class extends Component
     <x-button
       wire:click="join"
       class="btn-primary"
-      label="Unirse"
+      label="Unirse al Grupo"
       />
   @else
     @if ($group->owner_id === $member->id)
@@ -160,17 +151,39 @@ new class extends Component
   @endif
 
   <x-card>
-    <x-toggle
-      wire:model.live="published"
-      label="Grupo Publicado"
-      class="my-4"
-      />
-    <p class="text-info"></p><span class="font-bold">Nota:</span> Los grupos publicados no pueden modificar el evento que se seleccionó. Si el grupo tiene participantes aprobados, no se puede modificar el evento que se utilizará. Cerciorate de haber seleccionado el evento correcto antes de publicar el grupo.</p>
+
+    <div class="space-y-2">
+      @if ($published)
+        <x-toggle
+          wire:model.live='accepting'
+          label='Aceptando Inscripciones'
+          hint="Cerrar las inscripciones e iniciar el juego"
+          />
+      @else
+        <p>Selecciona un evento de la lista de eventos globales.</p>
+        <p>Cuando estés listo, publica el grupo para que puedan iniciar las inscripciones.</p>
+        <x-select
+          wire:model.live="event_id"
+          :options="$events"
+          option-value="id"
+          option-label="name"
+          placeholder="Selecciona un evento"
+          class="w-full max-w-xs outline-none!"
+          />
+        <x-toggle
+          wire:model.live="published"
+          label="Grupo Publicado"
+          />
+      @endif
+    </div>
   </x-card>
 
 
   @if ($published)
     @if ($member)
+      <div class="mt-6">
+        <livewire:members-card :group="$group" class="mt-6" />
+      </div>
       <x-button
         label="Pronosticar"
         class="btn-primary my-6"
@@ -185,41 +198,9 @@ new class extends Component
     @endif
   @else
     <x-card class="my-6">
-      <div class="space-y-2">
-        <p>Selecciona un evento de la lista de eventos globales, o bien presiona el botón para crear o editar tu propio evento y tus props</p>
-        <div class="flex justify-between items-center">
-          <div class="w-full">
-            <x-select
-              wire:model.live="event_id"
-              :options="$events"
-              option-value="id"
-              option-label="name"
-              placeholder="Selecciona un evento"
-              class="w-full max-w-xs outline-none!"
-              />
-          </div>
-
-          @if (!$event_id && $eventCount==0)
-            <x-button
-              label="Crear Evento"
-              icon="s-plus-circle"
-              class="btn-primary"
-              wire:click='createEvent'
-              />
-          @else
-            @if ($event_id && !$global)
-              <x-button
-                label="Editar Evento"
-                icon="s-pencil"
-                class="btn-secondary"
-                link="{{ route('events.show', ['event' => $group->event_id]) }}"
-                />
-            @endif
-          @endif
-        </div>
-      </div>
     </x-card>
   @endif
+
 
 
   <div class="mt-4">Leaderboard del grupo</div>

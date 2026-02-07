@@ -15,9 +15,10 @@ class GroupSeeder extends Seeder
     {
         $group = Group::create([
             'name' => 'La Quiniela',
+            'slug' => 'la-quiniela',
             'description' => 'El grupo de siempre, para los props del SB',
             'owner_id' => 1,
         ]);
-        $group->members()->attach(1, ['status' => GroupMemberStatus::approved->value]);
+        $group->members()->attach(1, ['status' => GroupMemberStatus::APPROVED->value]);
     }
 }

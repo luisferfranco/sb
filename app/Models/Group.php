@@ -16,11 +16,13 @@ class Group extends Model
         'event_id',
         'status',
         'published',
+        'accepting',
     ];
 
     protected $casts = [
         'status'    => GroupStatus::class,
         'published' => 'boolean',
+        'accepting' => 'boolean',
     ];
 
     protected static function booted()
@@ -56,5 +58,10 @@ class Group extends Model
     public function predictions()
     {
         return $this->hasMany(Prediction::class);
+    }
+
+    public function tickets()
+    {
+        return $this->hasMany(Ticket::class);
     }
 }

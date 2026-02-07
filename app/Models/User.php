@@ -58,4 +58,9 @@ class User extends Authenticatable
             ->withTimestamps()
             ->withPivot('status');
     }
+
+    public function tickets()
+    {
+        return $this->hasMany(Ticket::class);
+    }
 }
