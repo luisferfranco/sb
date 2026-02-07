@@ -78,11 +78,13 @@ new class extends Component
       class="btn-success"
       @click="$wire.openModal=true"
       />
-    <x-button
-      label="Eventos"
-      class="btn-secondary"
-      link="{{ route('events.index') }}"
-      />
+    @can('createGlobal', App\Models\Event::class)
+      <x-button
+        label="Eventos Globales"
+        class="btn-secondary"
+        link="{{ route('events.index') }}"
+        />
+    @endcan
   </div>
 
   <x-table
