@@ -5,6 +5,7 @@ use App\Models\Group;
 use Mary\Traits\Toast;
 use Livewire\Component;
 use App\Enums\EventType;
+use Livewire\Attributes\On;
 use App\Enums\GroupMemberStatus;
 
 new class extends Component
@@ -58,6 +59,14 @@ new class extends Component
     // Recargamos datos
     $this->updateData();
     $this->success('Solicitud de unión enviada');
+  }
+
+  #[On('join-request-sent')]
+  public function handleJoinRequestSent($payload): void
+  {
+    if ($payload['groupId'] === $this->group->id) {
+      $this->updateData();
+    }
   }
 
   public function approve(int $userId): void
@@ -127,11 +136,18 @@ new class extends Component
   <h1 class="text-xl">{{ $group->name }}</h1>
 
   @if (!$member)
-    <x-button
-      wire:click="join"
-      class="btn-primary"
-      label="Unirse al Grupo"
-      />
+    <div class="flex gap-1 items-center">
+      <x-button
+        wire:click="join"
+        class="btn-primary"
+        label="Solicitud de Ingreso"
+        />
+      <x-button
+        label="Visualizar los Props"
+        class="btn-secondary my-6 btn-ghost"
+        link="{{ route('events.show', ['event' => $group->event_id]) }}"
+        />
+    </div>
   @else
     @if ($group->owner_id === $member->id)
       <p class="text-sm text-base-content/70">Eres el propietario del grupo.</p>
@@ -150,34 +166,38 @@ new class extends Component
     @endif
   @endif
 
-  <x-card>
-
-    <div class="space-y-2">
-      @if ($published)
-        <x-toggle
-          wire:model.live='accepting'
-          label='Aceptando Inscripciones'
-          hint="Cerrar las inscripciones e iniciar el juego"
-          />
-      @else
-        <p>Selecciona un evento de la lista de eventos globales.</p>
-        <p>Cuando estés listo, publica el grupo para que puedan iniciar las inscripciones.</p>
-        <x-select
-          wire:model.live="event_id"
-          :options="$events"
-          option-value="id"
-          option-label="name"
-          placeholder="Selecciona un evento"
-          class="w-full max-w-xs outline-none!"
-          />
-        <x-toggle
-          wire:model.live="published"
-          label="Grupo Publicado"
-          />
-      @endif
-    </div>
-  </x-card>
-
+  {{--
+  Selecciona el evento que se usará
+  Abre y cierra las inscripciones al grupo
+  --}}
+  @can('manage', $group)
+    <x-card>
+      <div class="space-y-2">
+        @if ($published)
+          <x-toggle
+            wire:model.live='accepting'
+            label='Aceptando Inscripciones'
+            hint="Cerrar las inscripciones e iniciar el juego"
+            />
+        @else
+          <p>Selecciona un evento de la lista de eventos globales.</p>
+          <p>Cuando estés listo, publica el grupo para que puedan iniciar las inscripciones.</p>
+          <x-select
+            wire:model.live="event_id"
+            :options="$events"
+            option-value="id"
+            option-label="name"
+            placeholder="Selecciona un evento"
+            class="w-full max-w-xs outline-none!"
+            />
+          <x-toggle
+            wire:model.live="published"
+            label="Grupo Publicado"
+            />
+        @endif
+      </div>
+    </x-card>
+  @endcan
 
   @if ($published)
     @if ($member)
@@ -189,21 +209,8 @@ new class extends Component
         class="btn-primary my-6"
         link="{{ route('groups.prediction', ['group' => $group]) }}"
         />
-    @else
-      <x-button
-        label="Visualizar los Props del Evento"
-        class="btn-secondary my-6"
-        link="{{ route('events.show', ['event' => $group->event_id]) }}"
-        />
     @endif
-  @else
-    <x-card class="my-6">
-    </x-card>
   @endif
-
-
-
-  <div class="mt-4">Leaderboard del grupo</div>
 
   <x-table
     :headers="$headers"

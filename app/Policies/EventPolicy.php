@@ -13,6 +13,11 @@ class EventPolicy
         return $user->level === 99;
     }
 
+    public function manage(User $user, Event $event): bool
+    {
+        return $user->level === 99 || $event->owner_id === $user->id;
+    }
+
     /**
      * Determine whether the user can view any models.
      */

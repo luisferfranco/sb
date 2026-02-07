@@ -96,19 +96,20 @@ new class extends Component
       :rows="$tickets"
       >
       @scope('actions', $r)
-        @if ($this->group->accepting)
-          <x-button
-            icon="s-trash"
-            class="btn-error btn-sm"
-            wire:confirm="¿Estás seguro de que deseas eliminar este boleto?"
-            wire:click='deleteTicket({{ $r->id }})'
-            />
-        @else
+        <div class="flex gap-1">
+          @if ($this->group->accepting)
+            <x-button
+              icon="s-trash"
+              class="btn-error btn-sm"
+              wire:confirm="¿Estás seguro de que deseas eliminar este boleto?"
+              wire:click='deleteTicket({{ $r->id }})'
+              />
+          @endif
           <x-button
             icon="s-clipboard-document-check"
             class="btn-success btn-sm"
             />
-        @endif
+        </div>
       @endscope
     </x-table>
   @endif

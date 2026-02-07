@@ -171,48 +171,45 @@ new class extends Component
     </x-card>
   </x-modal>
 
-  <div class="py-1 px-2 bg-base-100 rounded mb-6 shadow-md">
-    <h1 class="text-2xl font-bold mb-4">{{ $event->name }}</h1>
+  <x-card title="{{ $event->name }}">
     @if ($event->description)
       <p>{{ $event->description }}</p>
     @endif
-    <x-toggle wire:model.live='published' label="Evento Publicado" />
-    <p class="text-base-content/50 text-xs"><span class="font-bold">Nota:</span>Los eventos que están publicados, o que ya tienen pronósticos, no pueden ser modificados</p>
-  </div>
 
-  <div class="border-b border-gray-500 my-2"></div>
+    @can('manage', $event)
+      <x-toggle wire:model.live='published' label="Evento Publicado" />
+      <p class="text-base-content/50 text-xs"><span class="font-bold">Nota:</span>Los eventos que están publicados, o que ya tienen pronósticos, no pueden ser modificados</p>
 
-  @if (!$published)
-    <x-button
-      label="Nuevo Prop"
-      icon="s-plus-circle"
-      class="btn-primary"
-      wire:click="createProp"
-      />
-  @endif
+      <x-button
+        label="Nuevo Prop"
+        icon="s-plus-circle"
+        class="btn-primary my-2"
+        wire:click="createProp"
+        />
+    @endcan
 
-  <div class="mt-4">Props del evento</div>
-  <x-table
-    :rows="$props"
-    :headers="$headers"
-    hover
-    >
-    @scope('actions', $r)
-      @if (!$this->published)
-        <div class="flex gap-1 justify-end">
-          <x-button
-            icon="s-pencil"
-            class="btn-primary btn-ghost btn-xs"
-            wire:click='editProp({{ $r->id }})'
-            />
-          <x-button
-            icon="s-trash"
-            class="btn-error btn-ghost btn-xs"
-            wire:confirm="¿Estás seguro de que deseas eliminar este prop?"
-            wire:click="delete({{ $r->id }})"
-            />
-        </div>
-      @endif
-    @endscope
-  </x-table>
+    <x-table
+      :rows="$props"
+      :headers="$headers"
+      hover
+      >
+      @scope('actions', $r)
+        @if (!$this->published)
+          <div class="flex gap-1 justify-end">
+            <x-button
+              icon="s-pencil"
+              class="btn-primary btn-ghost btn-xs"
+              wire:click='editProp({{ $r->id }})'
+              />
+            <x-button
+              icon="s-trash"
+              class="btn-error btn-ghost btn-xs"
+              wire:confirm="¿Estás seguro de que deseas eliminar este prop?"
+              wire:click="delete({{ $r->id }})"
+              />
+          </div>
+        @endif
+      @endscope
+    </x-table>
+  </x-card>
 </div>
