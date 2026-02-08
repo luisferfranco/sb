@@ -26,4 +26,9 @@ class Ticket extends Model
     {
         return $this->hasMany(Prediction::class);
     }
+
+    public function props()
+    {
+        return $this->group->event->props();
+    }
 }

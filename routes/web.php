@@ -10,9 +10,13 @@ Route::middleware(['auth'])->group(function () {
 
     Route::livewire('/groups/{group}', 'pages::groups.show')
       ->name('groups.show');
-    Route::livewire('/groups/{group}/prediction', 'pages::groups.prediction')
-      ->name('groups.prediction');
+
+    Route::livewire('/tickets/{ticket}/prediction', 'pages::tickets.prediction')
+      ->name('tickets.prediction');
 
     Route::livewire('/events', 'pages::events.index')->name('events.index');
     Route::livewire('/events/{event}', 'pages::events.show')->name('events.show');
+    Route::livewire('/events/{event}/score', 'pages::events.score')
+      ->name('events.score');
+
 });

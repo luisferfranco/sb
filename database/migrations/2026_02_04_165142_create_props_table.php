@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('opca');
             $table->string('opcb');
 
-            $table->boolean('is_a')->nullable();
+            $table->string('option')->nullable();
 
             $table->timestamps();
         });

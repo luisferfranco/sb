@@ -104,11 +104,12 @@ new class extends Component
               wire:confirm="¿Estás seguro de que deseas eliminar este boleto?"
               wire:click='deleteTicket({{ $r->id }})'
               />
+            <x-button
+              icon="s-clipboard-document-check"
+              class="btn-success btn-sm"
+              link="{{ route('tickets.prediction', ['ticket' => $r]) }}"
+              />
           @endif
-          <x-button
-            icon="s-clipboard-document-check"
-            class="btn-success btn-sm"
-            />
         </div>
       @endscope
     </x-table>

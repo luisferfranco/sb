@@ -28,8 +28,8 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $this->call([
-            GroupSeeder::class,
             EventSeeder::class,
+            GroupSeeder::class,
             PropSeeder::class,
         ]);
     }

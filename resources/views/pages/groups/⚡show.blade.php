@@ -21,10 +21,12 @@ new class extends Component
   public $global=false;
   public $eventCount=0;
   public $accepting = true;
+  public $section = 'home';
 
   public function mount(Group $group): void
   {
     $this->updateData();
+    $this->group = $group;
     $this->headers = [
       ['key' => 'user', 'label' => 'Miembro'],
       ['key' => 'pivot.status', 'label' => 'Estado'],
@@ -59,14 +61,6 @@ new class extends Component
     // Recargamos datos
     $this->updateData();
     $this->success('Solicitud de unión enviada');
-  }
-
-  #[On('join-request-sent')]
-  public function handleJoinRequestSent($payload): void
-  {
-    if ($payload['groupId'] === $this->group->id) {
-      $this->updateData();
-    }
   }
 
   public function approve(int $userId): void
@@ -157,11 +151,13 @@ new class extends Component
           value="{{ $member->pivot->status->label() }}"
           class="badge-{{ $member->pivot->status->color() }}"
         />
-        <p><x-button
+        @if ($accepting)
+          <x-button
             wire:click="leave"
             class="btn-error btn-sm"
             label="Abandonar el Grupo"
-            /></p>
+            />
+        @endif
       </div>
     @endif
   @endif
@@ -199,56 +195,75 @@ new class extends Component
     </x-card>
   @endcan
 
-  @if ($published)
-    @if ($member)
-      <div class="mt-6">
-        <livewire:members-card :group="$group" class="mt-6" />
-      </div>
-      <x-button
-        label="Pronosticar"
-        class="btn-primary my-6"
-        link="{{ route('groups.prediction', ['group' => $group]) }}"
-        />
-    @endif
+  @if ($published && $member)
+    <div class="mt-6">
+      <livewire:members-card :group="$group" class="mt-6" />
+    </div>
   @endif
 
-  <x-table
-    :headers="$headers"
-    :rows="$group->members"
-    >
-    @scope('cell_user', $r)
-      <p>{{ $r->name }}</p>
-      <p class="text-sm text-base-content/50">{{ $r->email }}</p>
-    @endscope
+  @can('manage', $group)
+    <div class="flex gap-1 items-center my-4">
+      <x-button
+        label="Home"
+        class="{{ $section == 'home' ? 'btn-warning' : 'btn-info btn-ghost' }}"
+        wire:click="$set('section', 'home')"
+        />
+      <x-button
+        label="Miembros"
+        class="{{ $section == 'members' ? 'btn-warning' : 'btn-info btn-ghost' }}"
+        wire:click="$set('section', 'members')"
+        />
+      @if (!$accepting)
+        <x-button
+          label="Califica"
+          class="btn-ghost btn-info"
+          link="{{ route('events.score', ['event' => $group->event]) }}"
+          />
+      @endif
+    </div>
+  @endcan
 
-    @scope('cell_pivot.status', $r)
-      <x-badge
-        value="{{ $r->pivot->status->label() }}"
-        class="badge-{{ $r->pivot->status->color() }}"
-      />
-    @endscope
+  @if ($section == 'home')
+    <livewire:leaderboard :group="$group" />
+  @elseif ($section == 'members')
+    <x-table
+      :headers="$headers"
+      :rows="$group->members"
+      >
+      @scope('cell_user', $r)
+        <p>{{ $r->name }}</p>
+        <p class="text-sm text-base-content/50">{{ $r->email }}</p>
+      @endscope
 
-    @scope('actions', $r)
-      @can('approve', $this->group)
-        <div class="flex gap-2">
-          @if ($r->pivot->status === GroupMemberStatus::PENDING)
-            <x-button
-              wire:click="approve({{ $r->id }})"
-              class="btn-success btn-sm"
-              icon="s-check-circle"
-              />
-          @endif
-          @if ($r->id !== $this->group->owner_id)
-            <x-button
-              wire:click="reject({{ $r->id }})"
-              wire:confirm="¿Estás seguro de que deseas rechazar a este usuario? - Si existe, se borrarán todos sus datos"
-              class="btn-error btn-sm"
-              icon="s-x-circle"
-              />
-          @endif
-        </div>
-      @endcan
-    @endscope
-  </x-table>
+      @scope('cell_pivot.status', $r)
+        <x-badge
+          value="{{ $r->pivot->status->label() }}"
+          class="badge-{{ $r->pivot->status->color() }}"
+        />
+      @endscope
+
+      @scope('actions', $r)
+        @can('approve', $this->group)
+          <div class="flex gap-2">
+            @if ($r->pivot->status === GroupMemberStatus::PENDING)
+              <x-button
+                wire:click="approve({{ $r->id }})"
+                class="btn-success btn-sm"
+                icon="s-check-circle"
+                />
+            @endif
+            @if ($r->id !== $this->group->owner_id)
+              <x-button
+                wire:click="reject({{ $r->id }})"
+                wire:confirm="¿Estás seguro de que deseas rechazar a este usuario? - Si existe, se borrarán todos sus datos"
+                class="btn-error btn-sm"
+                icon="s-x-circle"
+                />
+            @endif
+          </div>
+        @endcan
+      @endscope
+    </x-table>
+  @endif
 
 </div>

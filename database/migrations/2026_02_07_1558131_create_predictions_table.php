@@ -14,9 +14,6 @@ return new class extends Migration
         Schema::create('predictions', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignIdFor(\App\Models\Group::class)
-              ->constrained()
-              ->cascadeOnDelete();
             $table->foreignIdFor(\App\Models\Prop::class)
               ->constrained()
               ->cascadeOnDelete();
