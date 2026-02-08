@@ -3,7 +3,7 @@
 Route::livewire('/register', 'pages::auth.register')->name('register');
 Route::livewire('/login', 'pages::auth.login')->name('login');
 
-Route::livewire('/', 'pages::users.index');
+Route::livewire('/', 'pages::auth.login')->name('home');
 
 Route::middleware(['auth'])->group(function () {
     Route::livewire('/dashboard', 'pages::dashboard')->name('dashboard');

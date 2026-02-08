@@ -15,6 +15,13 @@ class extends Component
   public $email;
   public $password;
 
+  public function mount() {
+    // Si el usuario ya está autenticado, redirigirlo al dashboard
+    if (auth()->check()) {
+      return $this->redirectRoute('dashboard');
+    }
+  }
+
   public function login() {
     $this->validate([
       'email' => 'required|email',

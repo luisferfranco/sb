@@ -12,6 +12,9 @@
   </head>
   <body class="bg-base-200 min-h-screen">
     <div class="relative">
+      <div class="flex justify-end p-4">
+        <livewire:logout-button />
+      </div>
       <div class="absolute top-16 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
         <a href="{{ route('dashboard') }}"><img src="/img/sblogo.svg" alt="SB Logo" class="h-24 opacity-50"></a>
       </div>

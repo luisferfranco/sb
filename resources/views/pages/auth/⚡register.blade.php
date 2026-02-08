@@ -17,6 +17,13 @@ class extends Component
   public $password;
   public $password_confirmation;
 
+  public function mount() {
+    // Si el usuario ya está autenticado, redirigirlo al dashboard
+    if (auth()->check()) {
+      return $this->redirectRoute('dashboard');
+    }
+  }
+
   public function save() {
     $this->validate([
       'name' => 'required|string|max:255',
